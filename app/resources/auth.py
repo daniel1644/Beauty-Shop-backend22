@@ -42,6 +42,6 @@ class LoginResource(Resource):
 class LogoutResource(Resource):
     @jwt_required()
     def post(self):
-        # Currently, this endpoint does nothing but can be used for logging out
-        # For JWT logout, consider adding token blacklisting or invalidation logic
+        current_user = get_jwt_identity()
+        print(f"User trying to logout: {current_user}")
         return {"message": "Logout successful"}, 200
