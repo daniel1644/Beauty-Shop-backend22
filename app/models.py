@@ -9,6 +9,14 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     orders = relationship('Order', backref='user', lazy=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+            # Exclude password for security reasons
+        }
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -17,6 +25,16 @@ class Product(db.Model):
     category = db.Column(db.String(50), nullable=False)
     stock = db.Column(db.Integer, default=0)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+            'description': self.description,
+            'category': self.category,
+            'stock': self.stock
+        }
+
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
@@ -24,11 +42,28 @@ class CartItem(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product = relationship('Product')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'quantity': self.quantity,
+            'user_id': self.user_id,
+            'product': self.product.to_dict() if self.product else None
+        }
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total = db.Column(db.Float, nullable=False)
     items = relationship('OrderItem', backref='order', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'total': self.total,
+            'items': [item.to_dict() for item in self.items]
+        }
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,3 +71,12 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     product = relationship('Product')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'order_id': self.order_id,
+            'quantity': self.quantity,
+            'product': self.product.to_dict() if self.product else None
+        }
