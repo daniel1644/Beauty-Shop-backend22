@@ -1,4 +1,3 @@
-# app/__init__.py
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -6,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_session import Session
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from .config import Config  
 
 # Define metadata with custom naming convention
 metadata = MetaData(naming_convention={
@@ -15,16 +16,16 @@ metadata = MetaData(naming_convention={
 # Instantiate db and migrate
 db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
+jwt = JWTManager()  # Move JWTManager initialization here
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object(Config)
     
-    # Load configuration
-    app.config.from_object('app.config.Config')
-
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)  # Initialize JWTManager here
     
     # Initialize REST API
     api = Api(app)
@@ -34,7 +35,6 @@ def create_app():
     
     # Initialize Flask-Session
     Session(app)
-
 
     # Add a simple route for the root URL
     @app.route('/')
@@ -59,6 +59,5 @@ def create_app():
     api.add_resource(LoginResource, '/login')
     api.add_resource(RegisterResource, '/register')
     api.add_resource(LogoutResource, '/logout')
-    
 
     return app
