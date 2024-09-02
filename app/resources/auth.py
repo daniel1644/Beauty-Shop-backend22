@@ -28,17 +28,23 @@ class RegisterResource(Resource):
 class LoginResource(Resource):
     def post(self):
         data = request.get_json()
-        username = data.get('username')
+        email = data.get('email')  # Changed 'username' to 'email'
         password = data.get('password')
         
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):  # Verify hashed password
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
-            return {'access_token': access_token, 'refresh_token': refresh_token}, 200
+        # Find the user in the database by email
+        user = User.query.filter_by(email=email).first()  # Changed 'username' to 'email'
         
-        return {"message": "Invalid credentials"}, 401
-
+        if not user or not check_password_hash(user.password, password):
+            return {"message": "Invalid credentials"}, 401
+        
+        # Create JWT tokens
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }, 200
 class LogoutResource(Resource):
     @jwt_required()
     def post(self):
