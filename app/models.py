@@ -24,6 +24,7 @@ class Product(db.Model):
     description = db.Column(db.Text)
     category = db.Column(db.String(50), nullable=False)
     stock = db.Column(db.Integer, default=0)
+    image = db.Column(db.String(200))  # Add this line
 
     def to_dict(self):
         return {
@@ -32,9 +33,9 @@ class Product(db.Model):
             'price': self.price,
             'description': self.description,
             'category': self.category,
-            'stock': self.stock
+            'stock': self.stock,
+            'image': self.image  # Add this line to include image in to_dict
         }
-
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)

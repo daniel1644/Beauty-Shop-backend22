@@ -34,13 +34,20 @@ with app.app_context():
 
     print("Creating products...")
     products = []
+    image_paths = [
+        "https://example.com/image1.jpg",
+        "https://example.com/image2.jpg",
+        "https://example.com/image3.jpg",
+        # Add more image URLs here
+    ]
     for _ in range(20):
         product = Product(
             name=fake.word(),
             price=fake.random_number(digits=2),
             description=fake.text(),
             category=fake.word(),
-            stock=fake.random_number(digits=2)
+            stock=fake.random_number(digits=2),
+            image=rc(image_paths)  # Assign a random image URL to each product
         )
         db.session.add(product)
         products.append(product)
