@@ -1,9 +1,9 @@
 # run.py
-from app import create_app, db, app
+from app import create_app, db
 from dotenv import load_dotenv
 load_dotenv()
 
-# app = create_app()
+app = create_app()
 
 def init_db():
     with app.app_context():
