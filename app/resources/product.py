@@ -26,7 +26,11 @@ class ProductResource(Resource):
 
 class ProductListResource(Resource):
     def get(self):
-        products = Product.query.all()
+        category = request.args.get('category')
+        if category:
+            products = Product.query.filter_by(category=category).all()
+        else:
+            products = Product.query.all()
         schema = ProductSchema(many=True)
         return schema.dump(products), 200
 
@@ -37,3 +41,4 @@ class ProductListResource(Resource):
         db.session.add(product)
         db.session.commit()
         return schema.dump(product), 201
+
